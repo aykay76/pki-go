@@ -1,0 +1,47 @@
+<!doctype html>
+<html>
+
+<head>
+    <title>Root CA</title>
+    <link rel="shortcut icon" href="favicon.png">
+    <link rel="stylesheet" href="/css/bootstrap.css" type="text/css" />
+</head>
+
+<body>
+    <script type="text/javascript" src="/js/jquery-3.4.1.min.js"></script>
+    <script type="text/javascript" src="/js/bootstrap.min.js"></script>
+
+    <!--#include file="/nav.html"-->
+
+    <div class="container">
+        <h1 id="title">Put CA Name Here</h1>
+    </div>
+
+    <script>
+        $(document).ready(() => {
+            vars = {}
+            query = window.location.search.substring(1)
+            parts = query.split('&')
+            parts.forEach((part) => {
+                bits = part.split('=')
+                vars[bits[0]] = bits[1]
+            })
+
+            // TODO: get list of certs with continuation number for paging etc.
+
+            // TODO: each cert will have a revoke option that will call DELETE on /api/v1/pki/cert/xxx/ca/yyy
+
+            $('#title').click((e) => {
+                $.ajax({
+                    url: "/api/v1/pki/cert/c3af5a80/ca/c3af5a7dfa7b4a4c",
+                    type: 'DELETE',
+                    success: (result) => {
+                        console.log(result)
+                    }
+                })
+            })
+        })
+    </script>
+</body>
+
+</html>

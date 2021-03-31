@@ -1,0 +1,68 @@
+<!doctype html>
+<html>
+
+<head>
+    <title>Create New Root CA</title>
+    <link rel="shortcut icon" href="favicon.png">
+    <link rel="stylesheet" href="/css/bootstrap.css" type="text/css" />
+</head>
+
+<body>
+    <script type="text/javascript" src="/js/jquery-3.4.1.min.js"></script>
+    <script type="text/javascript" src="/js/bootstrap.min.js"></script>
+
+    <!--#include file="/nav.html"-->
+
+    <div class="container">
+        <h1>Create new authority root</h1>
+        <p>Use the form below to enter the details for a new certification authority root certificate. This will create a new, self-signed certificate that can then sign requests for other authorities that form the next level of hierarchy; or end entities if you want a flatter hierarchy.</p>
+        <form id="theform">
+            <div class="form-group">
+                <label for="commonName">Common name:</label>
+                <input type="text" class="form-control" aria-describedby="commonNameHelp" placeholder="e.g. Development Root CA" name="commonName" />
+                <small id="commonNameHelp" class="form-text text-muted">e.g. Development Root CA</small>
+            </div>
+            <div class="form-group">
+                <label for="organisation">Organisation:</label>
+                <input type="text" class="form-control" placeholder="Enter Company or Organisation Name" name="organisation">
+            </div>
+            <div class="form-group">
+                <label for="organisation">Organisational Unit:</label>
+                <input type="text" class="form-control" placeholder="Enter Department Name" name="organisationalUnit">
+            </div>
+            <div class="form-group">
+                <label for="organisation">Street Address:</label>
+                <input type="text" class="form-control" placeholder="Enter Street Name" name="streetAddress">
+            </div>
+            <div class="form-group">
+                <label for="organisation">Locality:</label>
+                <input type="text" class="form-control" placeholder="Enter City Name" name="locality">
+            </div>
+            <div class="form-group">
+                <label for="organisation">Province:</label>
+                <input type="text" class="form-control" placeholder="Enter County or Region" name="province">
+            </div>
+            <div class="form-group">
+                <label for="organisation">Post code:</label>
+                <input type="text" class="form-control" placeholder="Enter Postal Code" name="postalCode">
+            </div>
+            <!-- <div class="form-check">
+                <input type="checkbox" class="form-check-input" id="exampleCheck1">
+                <label class="form-check-label" for="exampleCheck1">Check me out</label>
+            </div> -->
+            <button type="submit" class="btn btn-primary">Create Root</button>
+        </form>
+    </div>
+
+    <script>
+        $('#theform').submit(function (event) {
+            $.post( "/api/v1/pki/root/create", $( "#theform" ).serialize() )
+            .done(function() {
+                window.location = '/pki/roots.html'
+            })
+            event.preventDefault()
+        })
+    </script>
+</body>
+
+</html>

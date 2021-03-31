@@ -1,0 +1,35 @@
+<!doctype html>
+<html>
+
+<head>
+    <title>Root CA</title>
+    <link rel="shortcut icon" href="favicon.png">
+    <link rel="stylesheet" href="/css/bootstrap.css" type="text/css" />
+</head>
+
+<body>
+    <script type="text/javascript" src="/js/jquery-3.4.1.min.js"></script>
+    <script type="text/javascript" src="/js/bootstrap.min.js"></script>
+
+    <!--#include file="/nav.html"-->
+
+    <div class="container">
+        <h1>Create New Key Pair</h1>
+    </div>
+
+    <script>
+        $(document).ready(() => {
+            vars = {}
+            query = window.location.search.substring(1)
+            parts = query.split('&')
+            parts.forEach((part) => {
+                bits = part.split('=')
+                vars[bits[0]] = bits[1]
+            })
+
+            // TODO: get list of certs with continuation number for paging etc.
+        })
+    </script>
+</body>
+
+</html>

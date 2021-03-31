@@ -1,0 +1,143 @@
+<!doctype html>
+<html>
+
+<head>
+    <title>Root Authorities</title>
+    <link rel="shortcut icon" href="favicon.png">
+    <link rel="stylesheet" href="/css/bootstrap.css" type="text/css" />
+</head>
+
+<body>
+    <script type="text/javascript" src="/js/jquery-3.4.1.min.js"></script>
+    <script type="text/javascript" src="/js/bootstrap.min.js"></script>
+
+    <!--#include file="/nav.html"-->
+
+    <div class="container">
+        <h1>Root Certificate Authorities</h1>
+        <p>Below is a list of certificate authorities available here. Click on the New Root button if you want to create
+            a new one.</p>
+        <div class="form-group">
+            <button type="button" id="newroot" class="btn btn-primary">New Root</button>
+        </div>
+        <div class="form-group">
+            <div id="roots" class="list-group col-md-12">
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" tabindex="-1" role="dialog" id="certmodal">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Public Certificate</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>The text below contains the public certificate for this authority. Save to a file with .cer
+                        format or import into your key store to ensure trust for certificates issued by this authority.
+                    </p>
+                    <textarea id="pem" class="form-control" rows="25" style="font-family: monospace;"></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary">OK</button>
+                    <!-- <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button> -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" tabindex="-1" role="dialog" id="csrmodal">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Certificate Signing Request</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>Paste your PEM encoded CSR into the box below and click Send to send the CSR to the chosen
+                        authority to sign.</p>
+                    <textarea id="csrpem" class="form-control" rows="12" style="font-family: monospace;"></textarea>
+                    <p>After you click Send, if the certificate is successfully signed you will see the details below,
+                        this can be copied into a .CER file:</p>
+                    <textarea id="certpem" class="form-control" rows="12" style="font-family: monospace;"></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button id="send" type="button" class="btn btn-primary">Send</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        url = ''
+        $(function () {
+            // on loading page, get list of root CAs from API
+            var jqxhr = $.get("/api/v1/pki/root/list")
+                .done(function (data) {
+                    console.log(data)
+                    roots = JSON.parse(data)
+
+                    for (i = 0; i < roots.length; i++) {
+                        $("#roots").append(
+                            '<li id="' + roots[i].id + '" class="list-group-item list-group-item-action" href="javascript:void(0)">' + roots[i].name + '<br/>' +
+                            '<span class="small">Expires: ' + roots[i].expires.substring(0, 10) + '</span>' +
+                            '<span class="float-right">' +
+                            '<a href="javascript:void(0);">' +
+                            '<img id="down-' + roots[i].id + '" src="/svg/icons-1.0.0-alpha2/icons/cloud-download.svg" alt="" width="23" height="23" title="Download" />' +
+                            '<img id="up-' + roots[i].id + '" src="/svg/icons-1.0.0-alpha2/icons/cloud-upload.svg" alt="" width="23" height="23" title="Upload" />' +
+                            '</a></span></li>')
+
+                        $(document).on('click', '#' + roots[i].id, function () {
+                            window.location = "/root.html?id=" + this.id
+                        })
+
+                        $(document).on('click', '#down-' + roots[i].id, function (e) {
+                            url = "/api/v1/pki/root/" + this.id.substring(5)
+
+                            $.get(url).done(function (data) {
+                                $('#pem').text(data)
+                                $('#certmodal').modal({ backdrop: true })
+                            })
+                            e.stopPropagation()
+                        })
+
+                        $(document).on('click', '#up-' + roots[i].id, function (e) {
+                            url = "/api/v1/pki/csr/" + this.id.substring(3)
+
+                            $('#csrmodal').modal({ backdrop: true })
+                            e.stopPropagation()
+                        })
+                    }
+                })
+                .fail(function () {
+                    alert("error")
+                })
+                .always(function () {
+
+                })
+
+            $('#send').click(function () {
+                csr = $('#csrpem').val()
+                
+                $.post(
+                    url, csr
+                ).done(function (data) {
+                    $('#certpem').text(data)
+                })
+            })
+
+
+            $('#newroot').click(function () {
+                window.location = '/pki/newroot.html'
+            })
+        })
+    </script>
+</body>
+
+</html>
